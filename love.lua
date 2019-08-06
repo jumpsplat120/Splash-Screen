@@ -33,10 +33,10 @@ function splash.draw()
 	local cx = win.w / 2
 	local cy = win.h / 2
 	
-	if runtime < 3 then
+	if runtime < 2 then
 		do
 			local height = cy
-			local width = (math.pow(runtime, 7))
+			local width = (math.pow(runtime, 10))
 			
 			do
 				local x = 0
@@ -57,7 +57,7 @@ function splash.draw()
 	end
 	
 	--Circle, rotation, and heart
-	if runtime >= 3 and runtime < 10 then
+	if runtime >= 2 and runtime < 10 then
 		love.graphics.translate(cx, cy)
 		love.graphics.rotate(math.rad(tilt))
 		love.graphics.translate(-cx, -cy)
@@ -66,7 +66,7 @@ function splash.draw()
 		do
 			local x      = cx
 			local y      = cy
-			local radius = inOutBack(runtime - 3, win.w / 1.5, 100 - win.w / 1.5, 2)
+			local radius = inOutBack(runtime - 2, win.w / 1.5, 100 - win.w / 1.5, 2)
 			
 			love.graphics.stencil(function() love.graphics.circle(mode, x, y, radius) end)
 		end
@@ -96,7 +96,7 @@ function splash.draw()
 		end
 		
 		--heart
-		if runtime >= 4 then
+		if runtime >= 3 then
 			love.graphics.setColor(white)
 			
 			love.graphics.translate(cx, cy)
@@ -104,7 +104,7 @@ function splash.draw()
 			love.graphics.translate(-cx, -cy)
 		
 			--ORIGINAL SIZE: 600x600
-			local size   = inOutElastic(runtime - 4, .05, 1, 2, 1)/5
+			local size   = inOutElastic(runtime - 3, .025, 1, 2, 1)/5
 			local x      = cx
 			local y      = cy
 			local r      = math.rad(-(45 + tilt))
@@ -112,18 +112,18 @@ function splash.draw()
 			
 			love.graphics.draw(heart, x, y, r, size, size, offset, offset)
 			
-			if tilt < 45 then tilt = -inOutBack(runtime - 4, 0, 45, 2) end
+			if tilt < 45 then tilt = -inOutBack(runtime - 3, 0, 45, 2) end
 		end
 		
 		--LOVE text
-		if runtime >= 4.5 then
+		if runtime >= 3.5 then
 			love.graphics.setColor(white)
 			
 			--ORIGINAL SIZE 1000x1000
-			local size   = constrain(0,1,runtime - 4.5)/3
+			local size   = constrain(0,1,runtime - 3.5)/3
 			local x      = cx
 			local y      = cy
-			local r      = outQuart(runtime - 4.5, 0, -5, 2) * 360
+			local r      = outQuart(runtime - 3.5, 0, -5, 2) * 360
 			local offset = 500
 			
 			love.graphics.setStencilTest("equal", 0)
