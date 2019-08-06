@@ -5,6 +5,7 @@ local splash = {}
 
 local runtime = 0
 local tilt    = 0
+local length  = 9
 
 local heart
 local powered
@@ -13,13 +14,13 @@ local win = {}
 
 win.w, win.h, win.flags = love.window.getMode( )
 
-function splash.load()
-	heart   = love.graphics.newImage(folder .. "/assets/heart.png")
-	powered = love.graphics.newImage(folder .. "/assets/powered.png")
-end
-
 function splash.update(dt)
+	if not heart   then heart   = love.graphics.newImage(folder .. "/assets/heart.png") end
+	if not powered then powered = love.graphics.newImage(folder .. "/assets/powered.png") end
 	runtime = runtime + dt
+	
+	--After 9 seconds, continue to next splash screen
+	if runtime >= length then return false else return true end
 end
 
 function splash.draw()
@@ -32,7 +33,7 @@ function splash.draw()
 	
 	local cx = win.w / 2
 	local cy = win.h / 2
-	
+
 	if runtime < 2 then
 		do
 			local height = cy
@@ -56,8 +57,8 @@ function splash.draw()
 		end
 	end
 	
-	--Circle, rotation, and heart
-	if runtime >= 2 and runtime < 10 then
+	--Circle, rotation, and heart anim
+	if runtime >= 2 and runtime < 6 then
 		love.graphics.translate(cx, cy)
 		love.graphics.rotate(math.rad(tilt))
 		love.graphics.translate(-cx, -cy)
@@ -129,6 +130,93 @@ function splash.draw()
 			love.graphics.setStencilTest("equal", 0)
 				love.graphics.draw(powered, x, y, math.rad(r), size, size, offset, offset)
 			love.graphics.setStencilTest()
+		end
+	end
+	
+	--Fade to black
+	if runtime >= 6 and runtime < 9 then	
+		--Circle stencil
+		do
+			local x      = cx
+			local y      = cy
+			local radius = inOutBack(runtime - 2, win.w / 1.5, 100 - win.w / 1.5, 2)
+			
+			love.graphics.stencil(function() love.graphics.circle(mode, x, y, radius) end)
+		end
+		
+		--Bars
+		do
+			love.graphics.translate(cx, cy)
+			love.graphics.rotate(math.rad(tilt))
+			love.graphics.translate(-cx, -cy)
+		
+			local height = cx
+			local width  = win.w
+			
+			love.graphics.setStencilTest("greater", 0)
+				--Top Bar
+				do
+					local x = 0
+					local y = 0
+					
+					love.graphics.setColor(pink)
+					love.graphics.rectangle(mode, x, y, width, height)
+				end
+				
+				--Bottom Bar
+				do
+					local x = win.w
+					local y = cy
+					
+					love.graphics.setColor(blue)
+					love.graphics.rectangle(mode, x, y, -width, height)
+				end
+			love.graphics.setStencilTest()
+			
+			love.graphics.translate(cx, cy)
+			love.graphics.rotate(math.rad(-tilt))
+			love.graphics.translate(-cx, -cy)
+		end
+		
+		--Heart
+		do
+			love.graphics.setColor(white)
+		
+			--ORIGINAL SIZE: 600x600
+			local size   = 1.025/5
+			local x      = cx
+			local y      = cy
+			local r      = 0
+			local offset = 300
+			
+			love.graphics.draw(heart, x, y, r, size, size, offset, offset)
+		end
+		
+		--Text
+		do
+			love.graphics.setColor(white)
+			
+			--ORIGINAL SIZE 1000x1000
+			local size   = 1/3
+			local x      = cx
+			local y      = cy
+			local r      = 0
+			local offset = 500
+			
+			love.graphics.draw(powered, x, y, math.rad(r), size, size, offset, offset)
+		end
+		
+		--Fade
+		do
+			local opacity = (runtime - 6) / 3
+			local color   = {0,0,0,opacity}
+			local x       = 0
+			local y       = 0
+			local width   = win.w
+			local height  = win.h
+			
+			love.graphics.setColor(color)
+			love.graphics.rectangle(mode, x, y, width, height)
 		end
 	end
 end
