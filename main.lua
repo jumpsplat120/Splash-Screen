@@ -8,16 +8,29 @@ local splash = {}
 
 splash.splashes = {"love", "jump", "END"}
 splash.index    = 1
+splash.load     = 1
 
 function splash.update(dt)
 	local current = splash.splashes[splash.index]
 	local running = true
 	
-	if current     == "love" then running = love_splash.update(dt)
-	elseif current == "jump" then running = jump_splash.update(dt)
+	--Load splashes in update to avoid load freeze
+	if splash.load == 1 then
+		love_splash.load()
+	elseif splash.load == 2 then
+		jump_splash.load()
+	elseif splash.load <= #splash.splashes then
+		
+		if current     == "love" then running = love_splash.update(dt, width, height)
+		elseif current == "jump" then running = jump_splash.update(dt, width, height)
+		end
+		
+		if not running and splash.index < #splash.splashes then
+		love.audio.stop()
+		splash.index = constrain(1, #splash.splashes, splash.index + 1) end
 	end
 	
-	if not running and splash.index < #splash.splashes then splash.index = constrain(1, #splash.splashes, splash.index + 1) end
+	splash.load = constrain(1, #splash.splashes, splash.load + 1)
 end
 
 function splash.draw()
@@ -29,11 +42,22 @@ function splash.draw()
 end
 
 function splash.keypressed(key, scancode, isrepeat)
-	if key and splash.index < #splash.splashes then splash.index = constrain(1, #splash.splashes, splash.index + 1) end
+	if key and splash.index < #splash.splashes then
+		love.audio.stop()
+		splash.index = constrain(1, #splash.splashes, splash.index + 1) 
+	end
 end
 
 function splash.mousepressed(x, y, button, istouch, presses)
-	if button and splash.index < #splash.splashes then splash.index = constrain(1, #splash.splashes, splash.index + 1) end
+	if button and splash.index < #splash.splashes then
+		love.audio.stop()
+		splash.index = constrain(1, #splash.splashes, splash.index + 1) 
+	end
+end
+
+function splash.resize(w, h)
+	width = w
+	height = h
 end
 
 function constrain(min, max, input)

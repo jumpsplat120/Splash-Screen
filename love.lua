@@ -3,28 +3,36 @@ local folder = string.match(path, ".*/")  or ""
 
 local splash = {}
 
-local runtime = 0
-local tilt    = 0
-local length  = 9
+local runtime, tilt, length, heart, powered, win
 
-local heart
-local powered
-
-local win = {}
-
-win.w, win.h, win.flags = love.window.getMode( )
-
-function splash.update(dt)
-	if not heart   then heart   = love.graphics.newImage(folder .. "/assets/heart.png") end
-	if not powered then powered = love.graphics.newImage(folder .. "/assets/powered.png") end
-	runtime = runtime + dt
+function splash.load()
+	splash = {}
+	win    = {}
 	
-	--After 9 seconds, continue to next splash screen
+	runtime = 0
+	tilt    = 0
+	length  = 9
+	
+	win.w, win.h, win.flags = love.window.getMode()
+	
+	heart   = love.graphics.newImage(folder .. "/assets/love/heart.png")
+	powered = love.graphics.newImage(folder .. "/assets/love/powered.png")
+	
+	trill = love.audio.newSource(folder .. "/assets/love/sound1.wav", "stream")
+	heatbeat = love.audio.newSource(folder .. "/assets/love/sound2.mp3", "stream")
+	
+	return true
+end
+
+function splash.update(dt, w, h)
+	win.w = w or win.w
+	win.h = h or win.h
+	runtime = runtime + dt
 	if runtime >= length then return false else return true end
 end
 
 function splash.draw()
-	--Bars sweeping across screen
+	
 	local blue  = {0.1529, 0.6666, 0.8823, 1}
 	local pink  = {0.9058, 0.2901, 0.6000, 1}
 	local white = {1.0000, 1.0000, 1.0000, 1}
@@ -33,27 +41,40 @@ function splash.draw()
 	
 	local cx = win.w / 2
 	local cy = win.h / 2
-
+	
+	--Bars sweeping across screen
 	if runtime < 2 then
+		
+		local height = cy
+		local width  = (math.pow(runtime, 10))
+		
 		do
-			local height = cy
-			local width = (math.pow(runtime, 10))
+			local x = 0
+			local y = 0
 			
-			do
-				local x = 0
-				local y = 0
-				
-				love.graphics.setColor(pink)
-				love.graphics.rectangle(mode, x, y, width, height)
-			end
+			love.graphics.setColor(pink)
+			love.graphics.rectangle(mode, x, y, width, height)
+		end
+		
+		do
+			local x = win.w
+			local y = cy
 			
-			do
-				local x = win.w
-				local y = cy
-				
-				love.graphics.setColor(blue)
-				love.graphics.rectangle(mode, x, y, -width, height)
-			end
+			love.graphics.setColor(blue)
+			love.graphics.rectangle(mode, x, y, -width, height)
+		end
+	end
+	
+	--Sound effect timing
+	if runtime <= 2 then
+		if not (trill:isPlaying()) then
+			trill:play()
+		end
+	end
+	
+	if runtime >= 3 and runtime <= 4 then
+		if not (heatbeat:isPlaying()) then
+			heatbeat:play()
 		end
 	end
 	
