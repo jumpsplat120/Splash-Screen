@@ -33,6 +33,7 @@ function splash.update(dt, w, h)
 end
 
 function splash.draw()
+	love.graphics.setColor(1,1,1,1)
 	local scale = win.w / video.width
 	local y = (math.abs(win.h - (scale * video.height))) * .5
 	love.graphics.draw(video.element, 0, y, 0, scale, scale)
