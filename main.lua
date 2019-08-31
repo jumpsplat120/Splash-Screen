@@ -12,7 +12,12 @@ splash.index    = 1
 splash.load     = 1
 
 function splash.update(dt)
-	if not splash.prevBG[1] then splash.prevBG = love.graphics.getBackgroundColor() end
+	if not splash.prevBG[1] then 
+		local r, g, b, a = love.graphics.getBackgroundColor()
+		splash.prevBG = {r, g, b, a}
+	else
+		love.graphics.setBackgroundColor(0,0,0,1)
+	end
 	
 	local current = splash.splashes[splash.index]
 	local running = true
@@ -75,7 +80,5 @@ end
 function constrain(min, max, input)
 	return math.max(math.min(input, max), min)
 end
-
-
 
 return splash
