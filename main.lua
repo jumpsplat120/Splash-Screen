@@ -4,13 +4,16 @@ local folder = string.match(path, ".*/")  or ""
 local jump_splash = require(folder .. "jump")
 local love_splash = require(folder .. "love")
 
-local splash = {}
+local splash  = {}
+splash.prevBG = {}
 
 splash.splashes = {"love", "jump", false}
 splash.index    = 1
 splash.load     = 1
 
 function splash.update(dt)
+	if not splash.prevBG[1] then splash.prevBG = love.graphics.getBackgroundColor() end
+	
 	local current = splash.splashes[splash.index]
 	local running = true
 	
@@ -23,7 +26,9 @@ function splash.update(dt)
 		
 		if current     == "love" then running = love_splash.update(dt, width, height)
 		elseif current == "jump" then running = jump_splash.update(dt, width, height)
-		else return false
+		else 
+			love.graphics.setBackgroundColor(splash.prevBG)
+			return false
 		end
 		
 		if not running and splash.index < #splash.splashes then
