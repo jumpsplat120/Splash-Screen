@@ -6,7 +6,7 @@ local love_splash = require(folder .. "love")
 
 local splash = {}
 
-splash.splashes = {"love", "jump", "END"}
+splash.splashes = {"love", "jump", false}
 splash.index    = 1
 splash.load     = 1
 
@@ -23,11 +23,13 @@ function splash.update(dt)
 		
 		if current     == "love" then running = love_splash.update(dt, width, height)
 		elseif current == "jump" then running = jump_splash.update(dt, width, height)
+		else return false
 		end
 		
 		if not running and splash.index < #splash.splashes then
-		love.audio.stop()
-		splash.index = constrain(1, #splash.splashes, splash.index + 1) end
+			love.audio.stop()
+			splash.index = constrain(1, #splash.splashes, splash.index + 1)
+		end
 	end
 	
 	splash.load = constrain(1, #splash.splashes, splash.load + 1)
@@ -38,6 +40,7 @@ function splash.draw()
 	
 	if current     == "love" then love_splash.draw(dt)
 	elseif current == "jump" then jump_splash.draw(dt)
+	else return false
 	end
 end
 
@@ -56,12 +59,18 @@ function splash.mousepressed(x, y, button, istouch, presses)
 end
 
 function splash.resize(w, h)
-	width = w
+	width  = w
 	height = h
+end
+
+function splash.isPlaying()
+	if splash.splashes == false then return false else return true end
 end
 
 function constrain(min, max, input)
 	return math.max(math.min(input, max), min)
 end
+
+
 
 return splash
