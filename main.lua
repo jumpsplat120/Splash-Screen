@@ -74,7 +74,7 @@ function splash.resize(w, h)
 end
 
 function splash.isPlaying()
-	if splash.splashes == false then return false else return true end
+	if splash.splashes[splash.index] == false then return false else return true end
 end
 
 function constrain(min, max, input)
