@@ -11,38 +11,44 @@ splash.splashes = {"love", "jump", false}
 splash.index    = 1
 splash.load     = 1
 
+local prev
+
 function splash.update(dt)
-	if not splash.prevBG[1] then 
-		local r, g, b, a = love.graphics.getBackgroundColor()
-		splash.prevBG = {r, g, b, a}
-	else
-		love.graphics.setBackgroundColor(0,0,0,1)
-	end
-	
 	local current = splash.splashes[splash.index]
 	local running = true
 	
 	--Load splashes in update to avoid load freeze
 	if splash.load == 1 then
 		love_splash.load()
+		splash.load = splash.load + 1
 	elseif splash.load == 2 then
 		jump_splash.load()
+		splash.load = splash.load + 1
 	elseif splash.load <= #splash.splashes then
+		
+		if not splash.prevBG[1] then 
+			local r, g, b, a = love.graphics.getBackgroundColor()
+			splash.prevBG = {r, g, b, a}
+		else
+			love.graphics.setBackgroundColor(0,0,0,1)
+		end
 		
 		if current     == "love" then running = love_splash.update(dt, width, height)
 		elseif current == "jump" then running = jump_splash.update(dt, width, height)
-		else 
-			love.graphics.setBackgroundColor(splash.prevBG)
-			return false
 		end
 		
 		if not running and splash.index < #splash.splashes then
 			love.audio.stop()
 			splash.index = constrain(1, #splash.splashes, splash.index + 1)
 		end
-	end
-	
-	splash.load = constrain(1, #splash.splashes, splash.load + 1)
+		
+		prev = current
+	elseif splash.prevBG then
+		love.graphics.setBackgroundColor(splash.prevBG)
+		splash.prevBG = nil
+	else
+		return false
+	end	
 end
 
 function splash.draw()
@@ -57,14 +63,14 @@ end
 function splash.keypressed(key, scancode, isrepeat)
 	if key and splash.index < #splash.splashes then
 		love.audio.stop()
-		splash.index = constrain(1, #splash.splashes, splash.index + 1) 
+		splash.index = constrain(1, #splash.splashes, splash.index + 1)
 	end
 end
 
 function splash.mousepressed(x, y, button, istouch, presses)
 	if button and splash.index < #splash.splashes then
 		love.audio.stop()
-		splash.index = constrain(1, #splash.splashes, splash.index + 1) 
+		splash.index = constrain(1, #splash.splashes, splash.index + 1)
 	end
 end
 
