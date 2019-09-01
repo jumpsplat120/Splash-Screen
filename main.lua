@@ -40,6 +40,8 @@ function splash.update(dt)
 		if not running and splash.index < #splash.splashes then
 			love.audio.stop()
 			splash.index = constrain(1, #splash.splashes, splash.index + 1)
+			
+			if splash.index == #splash.splashes then love.graphics.setBackgroundColor(splash.prevBG) end
 		end
 		
 		prev = current
@@ -64,6 +66,8 @@ function splash.keypressed(key, scancode, isrepeat)
 	if key and splash.index < #splash.splashes then
 		love.audio.stop()
 		splash.index = constrain(1, #splash.splashes, splash.index + 1)
+		
+		if splash.index == #splash.splashes then love.graphics.setBackgroundColor(splash.prevBG) end
 	end
 end
 
@@ -71,6 +75,8 @@ function splash.mousepressed(x, y, button, istouch, presses)
 	if button and splash.index < #splash.splashes then
 		love.audio.stop()
 		splash.index = constrain(1, #splash.splashes, splash.index + 1)
+		
+		if splash.index == #splash.splashes then love.graphics.setBackgroundColor(splash.prevBG) end
 	end
 end
 
