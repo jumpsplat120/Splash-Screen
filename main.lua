@@ -14,43 +14,48 @@ splash.load     = 1
 local prev
 
 function splash.update(dt)
-	local current = splash.splashes[splash.index]
-	local running = true
-	
-	--Load splashes in update to avoid load freeze
-	if splash.load == 1 then
-		love_splash.load()
-		splash.load = splash.load + 1
-	elseif splash.load == 2 then
-		jump_splash.load()
-		splash.load = splash.load + 1
-	elseif splash.load <= #splash.splashes then
+	if splash.isPlaying() then
+		local current = splash.splashes[splash.index]
+		local running = true
 		
 		if not splash.prevBG[1] then 
 			local r, g, b, a = love.graphics.getBackgroundColor()
 			splash.prevBG = {r, g, b, a}
-		else
+		end
+		--Load splashes in update to avoid load freeze
+		if splash.load == 1 then
+			love_splash.load()
+			splash.load = splash.load + 1
+		elseif splash.load == 2 then
+			jump_splash.load()
+			splash.load = splash.load + 1
+		elseif splash.load <= #splash.splashes then
 			love.graphics.setBackgroundColor(0,0,0,1)
-		end
-		
-		if current     == "love" then running = love_splash.update(dt, width, height)
-		elseif current == "jump" then running = jump_splash.update(dt, width, height)
-		end
-		
-		if not running and splash.index < #splash.splashes then
-			love.audio.stop()
-			splash.index = constrain(1, #splash.splashes, splash.index + 1)
 			
-			if splash.index == #splash.splashes then love.graphics.setBackgroundColor(splash.prevBG) end
+			if not (prev == current) then
+				j.log("Playing " .. current .. " splash!")
+			end
+			
+			if current     == "love" then running = love_splash.update(dt, width, height)
+			elseif current == "jump" then running = jump_splash.update(dt, width, height)
+			end
+			
+			if not running and splash.index < #splash.splashes then
+				love.audio.stop()
+				splash.index = constrain(1, #splash.splashes, splash.index + 1)
+				
+				if splash.index == #splash.splashes then 
+					j.log("Resetting background color!")
+					love.graphics.setBackgroundColor(splash.prevBG)
+					sm.change("loading")
+				end
+			end
+			
+			prev = current
+		else
+			return false
 		end
-		
-		prev = current
-	elseif splash.prevBG then
-		love.graphics.setBackgroundColor(splash.prevBG)
-		splash.prevBG = nil
-	else
-		return false
-	end	
+	end
 end
 
 function splash.draw()
@@ -63,20 +68,33 @@ function splash.draw()
 end
 
 function splash.keypressed(key, scancode, isrepeat)
+	if splash.load < #splash.splashes then return end
 	if key and splash.index < #splash.splashes then
 		love.audio.stop()
 		splash.index = constrain(1, #splash.splashes, splash.index + 1)
+		j.log("Skipping splash...")
 		
-		if splash.index == #splash.splashes then love.graphics.setBackgroundColor(splash.prevBG) end
+		if splash.index == #splash.splashes then 
+			j.log("Resetting background color!")
+			love.graphics.setBackgroundColor(splash.prevBG)
+			sm.change("loading")
+		end
 	end
 end
 
 function splash.mousepressed(x, y, button, istouch, presses)
+	if splash.load < #splash.splashes then return end
 	if button and splash.index < #splash.splashes then
 		love.audio.stop()
 		splash.index = constrain(1, #splash.splashes, splash.index + 1)
+		j.log("Skipping splash...")
 		
-		if splash.index == #splash.splashes then love.graphics.setBackgroundColor(splash.prevBG) end
+		
+		if splash.index == #splash.splashes then 
+			j.log("Resetting background color!")
+			love.graphics.setBackgroundColor(splash.prevBG)
+			sm.change("loading")
+		end
 	end
 end
 
