@@ -88,8 +88,7 @@ function splash.mousepressed(x, y, button, istouch, presses)
 		love.audio.stop()
 		splash.index = constrain(1, #splash.splashes, splash.index + 1)
 		j.log("Skipping splash...")
-		
-		
+			
 		if splash.index == #splash.splashes then 
 			j.log("Resetting background color!")
 			love.graphics.setBackgroundColor(splash.prevBG)
